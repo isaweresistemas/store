@@ -252,11 +252,20 @@ async function iniciar(){
   }
 
   if (produtoUrl && produtos.some(p => p.chave === produtoUrl)) {
+    // Chegou por um link de campanha (?produto=...): SEMPRE começa um pedido
+    // novo, mesmo que o navegador já tenha um pedido salvo de uma compra
+    // anterior (de outra pessoa ou de outro produto no mesmo aparelho).
+    // Sem isso, quem reabre o link cai direto na tela de pagamento do
+    // pedido antigo, sem preencher nada — foi o bug que gerou pedido "fantasma".
+    localStorage.removeItem(STORAGE_KEY);
     selecionarProduto(produtoUrl, true);
-  } else {
-    mostrarGrade();
+    return;
   }
 
+  // Sem produto na URL (acesso genérico ao comprar.html): aí sim, se tiver
+  // um pedido salvo (ex: a pessoa recarregou a página no meio da compra),
+  // retoma de onde parou.
+  mostrarGrade();
   const salvo = localStorage.getItem(STORAGE_KEY);
   if (salvo) {
     try {
@@ -418,18 +427,19 @@ function montarResultadoHtml(data){
   if (data.status === 'pendente') {
     return '<p class="msg">⏳ Ainda não identificamos seu pagamento. Se você já pagou, aguarde alguns segundos — a confirmação é automática. Também pode enviar o comprovante pelo WhatsApp para agilizar.</p>';
   }
+  const obrigado = '<p class="msg ok" style="font-size:1.15rem; margin-bottom:.6rem;">🎉 Obrigado pela sua compra!</p>';
   if (data.status === 'pago' && data.entrega === 'codigo' && data.codigo) {
-    return '<div class="codigo-box"><div class="produto-tag">✅ Pagamento confirmado! Seu código de acesso:</div><div class="codigo-valor">' + data.codigo + '</div></div>';
+    return obrigado + '<div class="codigo-box"><div class="produto-tag">Seu código de acesso:</div><div class="codigo-valor">' + data.codigo + '</div></div>';
   }
   if (data.status === 'pago' && data.entrega === 'link' && data.linkArquivo) {
-    return '<div class="codigo-box"><div class="produto-tag">✅ Pagamento confirmado! Baixe seu material:</div>' +
+    return obrigado + '<div class="codigo-box"><div class="produto-tag">Baixe seu material:</div>' +
       '<a class="btn btn-primary" style="margin-top:.8rem; display:inline-block; width:auto; padding:.7rem 1.4rem;" href="' + data.linkArquivo + '" target="_blank">📥 Baixar agora</a></div>';
   }
   if (data.status === 'em_configuracao') {
-    return '<p class="msg ok">✅ Pagamento confirmado! Estamos configurando seu sistema — você recebe os dados de acesso em até 48h.</p>';
+    return obrigado + '<p class="msg ok">Estamos configurando seu sistema — você recebe os dados de acesso em até 48h.</p>';
   }
   if (data.status === 'entregue') {
-    return '<p class="msg ok">✅ Seu sistema já foi entregue. Qualquer dúvida, fale com a gente pelo WhatsApp.</p>';
+    return obrigado + '<p class="msg ok">Seu sistema já foi entregue. Qualquer dúvida, fale com a gente pelo WhatsApp.</p>';
   }
   return '<p class="msg">Status: ' + data.status + '</p>';
 }
@@ -441,6 +451,12 @@ async function consultarEExibir(id, elId){
     const resp = await fetch(SCRIPT_URL + '?action=consultarPedido&id=' + encodeURIComponent(id), { cache:'no-store' });
     const data = await resp.json();
     el.innerHTML = montarResultadoHtml(data);
+    // Assim que o pedido sair de "pendente", o pedido salvo neste navegador
+    // não serve mais pra nada — limpa, pra não sobrar lixo que possa
+    // confundir uma futura visita genérica (sem ?produto= na URL).
+    if (data.ok && data.status && data.status !== 'pendente') {
+      localStorage.removeItem(STORAGE_KEY);
+    }
     return data;
   } catch(e) {
     el.innerHTML = '<p class="msg err">⚠️ Erro de conexão. Tente novamente.</p>';
