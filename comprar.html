@@ -7,15 +7,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --blue-deep: #050d2e;
-    --blue-bright: #1a5fff;
-    --cyan: #00d4ff;
-    --gold: #f5a623;
-    --green: #00e682;
-    --red: #ff4d6a;
-    --white: #ffffff;
-    --gray-soft: #b0bcd4;
-    --border: rgba(45,140,255,0.18);
+    --blue-deep: #170f2e;
+    --blue-bright: #7c6cf0;
+    --cyan: #38bdf8;
+    --gold: #ffb454;
+    --green: #34d399;
+    --red: #ff6b81;
+    --white: #fdf6ec;
+    --gray-soft: #c7bfd9;
+    --border: rgba(140,120,255,0.2);
+    --coral: #ff7a59;
+    --coral-light: #ffb454;
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
@@ -81,8 +83,8 @@
   }
   .btn:hover{opacity:.88; transform:translateY(-1px);}
   .btn:disabled{opacity:.5; cursor:default; transform:none;}
-  .btn-primary{background:linear-gradient(135deg,#a78bfa,var(--cyan)); color:#0a0a1a; box-shadow:0 4px 24px rgba(167,139,250,.35);}
-  .btn-pagar{background:linear-gradient(135deg,var(--green),var(--cyan)); color:#04180f; box-shadow:0 4px 24px rgba(0,230,130,.3);}
+  .btn-primary{background:linear-gradient(135deg,var(--blue-bright),var(--cyan)); color:#0a0a1a; box-shadow:0 4px 24px rgba(124,108,240,.35);}
+  .btn-pagar{background:linear-gradient(135deg,var(--coral),var(--coral-light)); color:#2b1200; box-shadow:0 6px 26px rgba(255,122,89,.4); font-weight:800;}
   .btn-ghost{background:transparent; border:1px solid var(--border); color:var(--white);}
 
   .pedido-id{
