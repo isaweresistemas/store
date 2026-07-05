@@ -328,7 +328,7 @@ async function gerarPedido(){
   const msgEl = document.getElementById('dadosMsg');
 
   if (!produtoSelecionado) { msgEl.className='msg err'; msgEl.textContent='Selecione um produto.'; return; }
-  if (!nome || !contato) { msgEl.className='msg err'; msgEl.textContent='Preencha com sue E-mail.'; return; }
+  if (!nome || !contato) { msgEl.className='msg err'; msgEl.textContent='Preencha com seu E-mail.'; return; }
 
   const btn = document.getElementById('btnGerarPedido');
   btn.disabled = true; btn.textContent = 'Gerando pedido...';
