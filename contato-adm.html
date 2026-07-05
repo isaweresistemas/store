@@ -813,7 +813,7 @@ function renderPedidos() {
       <td class="td-data">${p.timestamp || '—'}</td>
       <td>${p.nomeProduto || p.produto}</td>
       <td class="td-nome">${escapar(p.nome)}</td>
-      <td>${escapar(p.contato)}</td>
+      <td>${escapar(p.contato)}${p.observacoes ? '<br><small style="opacity:.65">📱 reserva: ' + escapar(p.observacoes) + '</small>' : ''}</td>
       <td>${formatarMoeda(p.valor)}</td>
       <td>${badgeStatus(p.status)}</td>
       <td>${acao}</td>
