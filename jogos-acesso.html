@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogos ISAWERE · Área do Cliente</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-deep: #050d2e;
+    --blue-bright: #1a5fff;
+    --blue-electric: #2d8cff;
+    --cyan: #00d4ff;
+    --gold: #f5a623;
+    --green: #00e682;
+    --red: #ff4d6a;
+    --white: #ffffff;
+    --gray-light: #e8edf8;
+    --gray-soft: #b0bcd4;
+    --border: rgba(45,140,255,0.18);
+    --cat-raciocinio: #a78bfa;
+    --cat-acao: #f87171;
+    --cat-aventura: #34d399;
+    --cat-criatividade: #fb923c;
+    --cat-esporte: #38bdf8;
+    --cat-classicos: #fbbf24;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--blue-deep); color: var(--white); min-height: 100vh; overflow-x: hidden; }
+
+  /* ══════════════════════════════
+     TELA DE ACESSO (senha/código)
+  ══════════════════════════════ */
+  #gateScreen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: radial-gradient(ellipse at 25% 30%, rgba(167,139,250,0.16) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 75%, rgba(0,212,255,0.12) 0%, transparent 55%),
+                var(--blue-deep);
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.5rem; transition: opacity 0.5s ease;
+  }
+  #gateScreen.hide { opacity: 0; pointer-events: none; }
+
+  .gate-emojis span {
+    position: absolute; font-size: 1.8rem; opacity: 0.16;
+    animation: emojiDrift 9s ease-in-out infinite alternate; pointer-events: none;
+  }
+  .gate-emojis span:nth-child(1) { top: 12%; left: 8%; }
+  .gate-emojis span:nth-child(2) { top: 70%; left: 12%; animation-delay: -2s; }
+  .gate-emojis span:nth-child(3) { top: 18%; right: 10%; animation-delay: -4s; }
+  .gate-emojis span:nth-child(4) { top: 68%; right: 9%; animation-delay: -6s; }
+  @keyframes emojiDrift { from { transform: translateY(0) rotate(-4deg); } to { transform: translateY(-18px) rotate(6deg); } }
+
+  .gate-box {
+    position: relative; z-index: 2;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 26px;
+    padding: 2.6rem 2.2rem;
+    width: 100%; max-width: 420px;
+    box-shadow: 0 40px 90px rgba(0,0,10,0.5);
+    backdrop-filter: blur(24px);
+    text-align: center;
+  }
+  .gate-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: rgba(167,139,250,0.15); border: 1px solid rgba(167,139,250,0.4);
+    color: #c4b5fd; padding: 0.3rem 0.9rem; border-radius: 50px;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .gate-title {
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.5rem;
+    line-height: 1.25; margin-bottom: 0.6rem;
+  }
+  .gate-title span {
+    background: linear-gradient(135deg, #a78bfa, #34d399, var(--cyan));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .gate-sub { font-size: 0.85rem; color: var(--gray-soft); margin-bottom: 1.8rem; line-height: 1.55; }
+  .gate-label { display: block; font-size: 0.74rem; color: var(--gray-soft); text-align: left; margin-bottom: 0.35rem; font-weight: 500; }
+  .gate-input {
+    width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 12px; padding: 0.85rem 1rem; color: var(--white);
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; outline: none; text-align: center;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    transition: border-color 0.2s, background 0.2s; margin-bottom: 1.2rem;
+  }
+  .gate-input:focus { border-color: var(--cyan); background: rgba(0,212,255,0.06); }
+  .gate-btn {
+    width: 100%; background: linear-gradient(135deg, #a78bfa, var(--cyan));
+    color: #0a0a1a; padding: 0.9rem; border: none; border-radius: 50px;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.95rem;
+    cursor: pointer; transition: opacity 0.2s, transform 0.2s;
+    box-shadow: 0 4px 24px rgba(167,139,250,0.35);
+  }
+  .gate-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .gate-btn:disabled { opacity: 0.6; cursor: default; transform: none; }
+  .gate-msg { font-size: 0.82rem; margin-top: 1rem; min-height: 1.2em; }
+  .gate-msg.err { color: var(--red); }
+  .gate-msg.ok { color: var(--green); }
+  .gate-help {
+    margin-top: 1.6rem; padding-top: 1.4rem; border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.78rem; color: var(--gray-soft); line-height: 1.6;
+  }
+  .gate-help a { color: var(--cyan); text-decoration: none; font-weight: 600; }
+  .gate-help a:hover { text-decoration: underline; }
+
+  /* ══════════════════════════════
+     ÁREA LIBERADA (jogos)
+  ══════════════════════════════ */
+  #jogosArea { display: none; }
+  #jogosArea.visible { display: block; }
+
+  header {
+    position: sticky; top: 0; z-index: 300;
+    background: rgba(5,13,46,0.92); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 5%; display: flex; align-items: center;
+    justify-content: space-between; height: 64px;
+  }
+  .logo-text {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem;
+    background: linear-gradient(135deg, var(--cyan), var(--blue-electric));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .header-right { display: flex; align-items: center; gap: 1rem; }
+  .welcome-badge {
+    font-size: 0.76rem; color: var(--gray-soft); background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border); border-radius: 50px; padding: 0.3rem 0.9rem;
+    display: none;
+  }
+  .welcome-badge.show { display: inline-block; }
+  .btn-sair {
+    background: transparent; border: 1px solid rgba(255,77,106,0.35);
+    color: var(--red); font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.9rem;
+    border-radius: 50px; cursor: pointer; transition: background 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-sair:hover { background: rgba(255,77,106,0.1); }
+
+  .hero { padding: 3rem 5% 2rem; text-align: center; }
+  .hero-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.15; margin-bottom: 0.6rem; }
+  .hero-title span {
+    background: linear-gradient(135deg, #a78bfa, #34d399, var(--cyan));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-sub { font-size: 0.95rem; color: var(--gray-soft); max-width: 520px; margin: 0 auto; line-height: 1.6; }
+
+  .games-section { padding: 20px 5% 60px; }
+  .category-block { margin-bottom: 3rem; }
+  .category-header {
+    display: flex; align-items: center; gap: 0.8rem;
+    margin-bottom: 1.3rem; padding-bottom: 0.7rem;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .category-icon { font-size: 1.4rem; }
+  .category-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .category-count { margin-left: auto; font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 50px; background: rgba(255,255,255,0.07); color: var(--gray-soft); }
+
+  .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+  .game-card {
+    position: relative; border-radius: 18px; overflow: hidden;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.09);
+    padding: 1.3rem 1.1rem 1.1rem; text-decoration: none; color: var(--white);
+    display: flex; flex-direction: column; gap: 0.45rem;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s; cursor: pointer;
+  }
+  .game-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(0,0,0,0.4); }
+  .game-emoji { font-size: 1.9rem; }
+  .game-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.92rem; }
+  .game-play { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem; padding: 0.28rem 0.75rem; border-radius: 50px; width: fit-content; }
+
+  .cat-raciocinio .game-card { border-color: rgba(167,139,250,0.2); }
+  .cat-raciocinio .game-card:hover { border-color: rgba(167,139,250,0.5); box-shadow: 0 16px 48px rgba(167,139,250,0.15); }
+  .cat-raciocinio .category-name { color: var(--cat-raciocinio); }
+  .cat-raciocinio .game-play { background: rgba(167,139,250,0.15); color: #c4b5fd; }
+
+  .cat-acao .game-card { border-color: rgba(248,113,113,0.2); }
+  .cat-acao .game-card:hover { border-color: rgba(248,113,113,0.5); box-shadow: 0 16px 48px rgba(248,113,113,0.15); }
+  .cat-acao .category-name { color: var(--cat-acao); }
+  .cat-acao .game-play { background: rgba(248,113,113,0.15); color: #fca5a5; }
+
+  .cat-aventura .game-card { border-color: rgba(52,211,153,0.2); }
+  .cat-aventura .game-card:hover { border-color: rgba(52,211,153,0.5); box-shadow: 0 16px 48px rgba(52,211,153,0.15); }
+  .cat-aventura .category-name { color: var(--cat-aventura); }
+  .cat-aventura .game-play { background: rgba(52,211,153,0.15); color: #6ee7b7; }
+
+  .cat-criatividade .game-card { border-color: rgba(251,146,60,0.2); }
+  .cat-criatividade .game-card:hover { border-color: rgba(251,146,60,0.5); box-shadow: 0 16px 48px rgba(251,146,60,0.15); }
+  .cat-criatividade .category-name { color: var(--cat-criatividade); }
+  .cat-criatividade .game-play { background: rgba(251,146,60,0.15); color: #fdba74; }
+
+  .cat-esporte .game-card { border-color: rgba(56,189,248,0.2); }
+  .cat-esporte .game-card:hover { border-color: rgba(56,189,248,0.5); box-shadow: 0 16px 48px rgba(56,189,248,0.15); }
+  .cat-esporte .category-name { color: var(--cat-esporte); }
+  .cat-esporte .game-play { background: rgba(56,189,248,0.15); color: #7dd3fc; }
+
+  .cat-classicos .game-card { border-color: rgba(251,191,36,0.2); }
+  .cat-classicos .game-card:hover { border-color: rgba(251,191,36,0.5); box-shadow: 0 16px 48px rgba(251,191,36,0.15); }
+  .cat-classicos .category-name { color: var(--cat-classicos); }
+  .cat-classicos .game-play { background: rgba(251,191,36,0.15); color: #fde68a; }
+
+  .expira-banner {
+    margin: 0 5% 2rem; padding: 0.9rem 1.4rem; border-radius: 14px;
+    background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.3);
+    color: var(--gold); font-size: 0.82rem; text-align: center; display: none;
+  }
+  .expira-banner.show { display: block; }
+
+  @media (max-width: 480px) {
+    .games-grid { grid-template-columns: 1fr 1fr; }
+    .game-card { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     TELA DE ACESSO
+══════════════════════════════ -->
+<div id="gateScreen">
+  <div class="gate-emojis">
+    <span>🎮</span><span>🧩</span><span>⭐</span><span>🎯</span>
+  </div>
+  <div class="gate-box">
+    <div class="gate-badge">🎓 ISAWERE · Área do Cliente</div>
+    <h1 class="gate-title">Jogos para a <span>família e todas as idades</span></h1>
+    <p class="gate-sub">Digite o código de acesso que você recebeu na compra para liberar todos os jogos.</p>
+
+    <label class="gate-label">Código de acesso</label>
+    <input class="gate-input" type="text" id="codigoInput" placeholder="EX: TQXZ4821"
+           onkeydown="if(event.key==='Enter') validarCodigo()">
+    <button class="gate-btn" id="btnEntrar" onclick="validarCodigo()">Entrar e Jogar 🚀</button>
+    <div class="gate-msg" id="gateMsg"></div>
+
+    <div class="gate-help">
+      Ainda não tem um código? <a href="https://www.isawere.com.br/jogos.html">Conheça os jogos e adquira o seu</a>.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     ÁREA LIBERADA
+══════════════════════════════ -->
+<div id="jogosArea">
+  <header>
+    <div class="logo-text">ISAWERE · Jogos</div>
+    <div class="header-right">
+      <div class="welcome-badge" id="welcomeBadge"></div>
+      <button class="btn-sair" onclick="sair()">Sair</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1 class="hero-title">Jogos para a <span>família e todas as idades</span></h1>
+    <p class="hero-sub">Escolha um jogo abaixo e divirta-se — sem precisar instalar nada, direto do navegador.</p>
+  </section>
+
+  <div class="expira-banner" id="expiraBanner"></div>
+
+  <section class="games-section">
+
+    <div class="category-block cat-raciocinio">
+      <div class="category-header">
+        <span class="category-icon">🧠</span>
+        <span class="category-name">Raciocínio & Memória</span>
+        <span class="category-count">5 jogos</span>
+      </div>
+      <div class="games-grid">
+        <a class="game-card" href="private/jogo-memoria.html"><div class="game-emoji">🃏</div><div class="game-name">Jogo da Memória</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/jogo-da-velha.html"><div class="game-emoji">⭕</div><div class="game-name">Jogo da Velha</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/cruzadinhas.html"><div class="game-emoji">📝</div><div class="game-name">Cruzadinhas</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/sete-erros.html"><div class="game-emoji">🔍</div><div class="game-name">Sete Erros</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/forca.html"><div class="game-emoji">🔤</div><div class="game-name">Forca</div><div class="game-play">▶ Jogar</div></a>
+      </div>
+    </div>
+
+    <div class="category-block cat-acao">
+      <div class="category-header">
+        <span class="category-icon">⚡</span>
+        <span class="category-name">Ação & Habilidade</span>
+        <span class="category-count">5 jogos</span>
+      </div>
+      <div class="games-grid">
+        <a class="game-card" href="private/snake.html"><div class="game-emoji">🐍</div><div class="game-name">Snake</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/tetris.html"><div class="game-emoji">🟦</div><div class="game-name">Tetris</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/breakout.html"><div class="game-emoji">🧱</div><div class="game-name">Breakout</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/pac-man.html"><div class="game-emoji">🟡</div><div class="game-name">Pac-Man</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/starall.html"><div class="game-emoji">⭐</div><div class="game-name">Star All</div><div class="game-play">▶ Jogar</div></a>
+      </div>
+    </div>
+
+    <div class="category-block cat-aventura">
+      <div class="category-header">
+        <span class="category-icon">🗺️</span>
+        <span class="category-name">Aventura & RPG</span>
+        <span class="category-count">3 jogos</span>
+      </div>
+      <div class="games-grid">
+        <a class="game-card" href="private/braventura.html"><div class="game-emoji">⚔️</div><div class="game-name">Braventura</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/carmen-aventureira.html"><div class="game-emoji">🌍</div><div class="game-name">Carmen Aventureira</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/cacatesouro.html"><div class="game-emoji">🏴‍☠️</div><div class="game-name">Caça ao Tesouro</div><div class="game-play">▶ Jogar</div></a>
+      </div>
+    </div>
+
+    <div class="category-block cat-criatividade">
+      <div class="category-header">
+        <span class="category-icon">🎨</span>
+        <span class="category-name">Criatividade & Arte</span>
+        <span class="category-count">3 jogos</span>
+      </div>
+      <div class="games-grid">
+        <a class="game-card" href="private/colorir.html"><div class="game-emoji">🖌️</div><div class="game-name">Colorir</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/dress-up.html"><div class="game-emoji">👗</div><div class="game-name">Dress Up</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/salao-beleza.html"><div class="game-emoji">💄</div><div class="game-name">Salão de Beleza</div><div class="game-play">▶ Jogar</div></a>
+      </div>
+    </div>
+
+    <div class="category-block cat-esporte">
+      <div class="category-header">
+        <span class="category-icon">🏆</span>
+        <span class="category-name">Esporte</span>
+        <span class="category-count">2 jogos</span>
+      </div>
+      <div class="games-grid">
+        <a class="game-card" href="private/footgol.html"><div class="game-emoji">⚽</div><div class="game-name">Footgol</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/race-game.html"><div class="game-emoji">🏎️</div><div class="game-name">Race Game</div><div class="game-play">▶ Jogar</div></a>
+      </div>
+    </div>
+
+    <div class="category-block cat-classicos">
+      <div class="category-header">
+        <span class="category-icon">🌟</span>
+        <span class="category-name">Clássicos Educativos</span>
+        <span class="category-count">3 jogos</span>
+      </div>
+      <div class="games-grid">
+        <a class="game-card" href="private/schoolgame.html"><div class="game-emoji">🏫</div><div class="game-name">School Game</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/bolhas-baby.html"><div class="game-emoji">🫧</div><div class="game-name">Bolhas Baby</div><div class="game-play">▶ Jogar</div></a>
+        <a class="game-card" href="private/robo-educativo.html"><div class="game-emoji">🤖</div><div class="game-name">Robô Educativo</div><div class="game-play">▶ Jogar</div></a>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   ⚠️  CONFIGURAÇÕES — ALTERE AQUI
+══════════════════════════════════════════════════════ */
+const SCRIPT_URL       = 'https://script.google.com/macros/s/AKfycbxITnfKG9XCvTNN3C4iCesriU7nkXkFMbG9xVJeJQEnnKGJUpT9_EGB8Kp-CbMI_q3whA/exec'; // Code.gs (Pedidos/Licencas/Assinaturas)
+const SENHA_MASTER     = 'ISAWEREMASTER'; // troque por uma senha só sua, pra testar/demonstrar sem gastar código de cliente
+const STORAGE_KEY      = 'isawere_jogos_sessao';
+/* ══════════════════════════════════════════════════════ */
+
+const gateScreen  = document.getElementById('gateScreen');
+const jogosArea   = document.getElementById('jogosArea');
+const gateMsg     = document.getElementById('gateMsg');
+const btnEntrar   = document.getElementById('btnEntrar');
+const welcomeBadge = document.getElementById('welcomeBadge');
+const expiraBanner = document.getElementById('expiraBanner');
+
+/* ── Ao carregar a página, verifica se já tem sessão salva ── */
+window.addEventListener('DOMContentLoaded', () => {
+  const salvo = localStorage.getItem(STORAGE_KEY);
+  if (!salvo) return;
+
+  try {
+    const sessao = JSON.parse(salvo);
+    if (sessao.master) {
+      liberarAcesso({ master: true });
+      return;
+    }
+    if (sessao.expiraEm && new Date(sessao.expiraEm) < new Date()) {
+      localStorage.removeItem(STORAGE_KEY); // expirou, precisa validar de novo
+      return;
+    }
+    liberarAcesso({ master: false, expiraEm: sessao.expiraEm });
+  } catch (e) {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+});
+
+/* ── Valida o código digitado ── */
+async function validarCodigo() {
+  const valor = document.getElementById('codigoInput').value.trim();
+  if (!valor) {
+    gateMsg.className = 'gate-msg err';
+    gateMsg.textContent = 'Digite o código de acesso.';
+    return;
+  }
+
+  // Senha master: bypass local, não consulta a planilha
+  if (valor.toUpperCase() === SENHA_MASTER.toUpperCase()) {
+    gateMsg.className = 'gate-msg ok';
+    gateMsg.textContent = '✅ Você acessou com a senha master. Seja bem-vindo!';
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ master: true }));
+    setTimeout(() => liberarAcesso({ master: true }), 700);
+    return;
+  }
+
+  btnEntrar.disabled = true;
+  btnEntrar.textContent = 'Verificando...';
+  gateMsg.className = 'gate-msg';
+  gateMsg.textContent = '';
+
+  try {
+    const resp = await fetch(SCRIPT_URL + '?action=validarAcesso&codigo=' + encodeURIComponent(valor), { cache: 'no-store' });
+    const data = await resp.json();
+
+    if (data.ok) {
+      gateMsg.className = 'gate-msg ok';
+      gateMsg.textContent = '✅ Código válido! Seja bem-vindo(a).';
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ master: false, expiraEm: data.expiraEm || null }));
+      setTimeout(() => liberarAcesso({ master: false, expiraEm: data.expiraEm }), 700);
+    } else {
+      gateMsg.className = 'gate-msg err';
+      gateMsg.textContent = '❌ ' + (data.erro || 'Código inválido.');
+      btnEntrar.disabled = false;
+      btnEntrar.textContent = 'Entrar e Jogar 🚀';
+    }
+  } catch (err) {
+    gateMsg.className = 'gate-msg err';
+    gateMsg.textContent = '⚠️ Não foi possível verificar agora. Tente novamente.';
+    btnEntrar.disabled = false;
+    btnEntrar.textContent = 'Entrar e Jogar 🚀';
+  }
+}
+
+/* ── Libera a área de jogos ── */
+function liberarAcesso(info) {
+  gateScreen.classList.add('hide');
+  setTimeout(() => { gateScreen.style.display = 'none'; }, 500);
+  jogosArea.classList.add('visible');
+
+  if (info.master) {
+    welcomeBadge.textContent = '👑 Sessão master';
+    welcomeBadge.classList.add('show');
+  } else if (info.expiraEm) {
+    const data = new Date(info.expiraEm);
+    welcomeBadge.textContent = 'Acesso até ' + data.toLocaleDateString('pt-BR');
+    welcomeBadge.classList.add('show');
+
+    const diasRestantes = Math.ceil((data - new Date()) / (1000 * 60 * 60 * 24));
+    if (diasRestantes <= 7) {
+      expiraBanner.textContent = '⏰ Seu acesso expira em ' + diasRestantes + ' dia(s). Renove para continuar jogando.';
+      expiraBanner.classList.add('show');
+    }
+  }
+}
+
+/* ── Sai da sessão (esquece o código salvo) ── */
+function sair() {
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+</script>
+</body>
+</html>

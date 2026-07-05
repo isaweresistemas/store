@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comprar · ISAWERE</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-deep: #050d2e;
+    --blue-bright: #1a5fff;
+    --cyan: #00d4ff;
+    --gold: #f5a623;
+    --green: #00e682;
+    --red: #ff4d6a;
+    --white: #ffffff;
+    --gray-soft: #b0bcd4;
+    --border: rgba(45,140,255,0.18);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'DM Sans',sans-serif; color:var(--white); min-height:100vh;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(167,139,250,0.14) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 80%, rgba(0,212,255,0.12) 0%, transparent 55%),
+      var(--blue-deep);
+  }
+  header{
+    position:sticky; top:0; z-index:100; background:rgba(5,13,46,0.92); backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border); padding:0 5%; height:64px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo{
+    font-family:'Syne',sans-serif; font-weight:800; font-size:1.3rem;
+    background:linear-gradient(135deg,var(--cyan),var(--blue-bright));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-decoration:none;
+  }
+  .steps-indicator{font-size:.72rem; color:var(--gray-soft);}
+  main{max-width:560px; margin:0 auto; padding:2.5rem 1.25rem 5rem;}
+  .hero-title{font-family:'Nunito',sans-serif; font-weight:900; font-size:clamp(1.4rem,4vw,1.9rem); text-align:center; margin-bottom:.4rem;}
+  .hero-title span{background:linear-gradient(135deg,#a78bfa,#34d399,var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;}
+  .hero-sub{text-align:center; font-size:.88rem; color:var(--gray-soft); margin-bottom:2.2rem; line-height:1.55;}
+
+  .card{
+    background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:22px;
+    padding:1.6rem; margin-bottom:1.2rem; backdrop-filter:blur(20px);
+  }
+  .card-label{font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--cyan); margin-bottom:.9rem;}
+
+  #produtosGrid{display:grid; gap:.7rem;}
+  .produto-opt{
+    display:flex; align-items:center; gap:.8rem; padding:.9rem 1rem; border-radius:14px;
+    border:1px solid var(--border); background:rgba(255,255,255,0.02); cursor:pointer;
+    transition:border-color .2s, background .2s; text-align:left; width:100%;
+    font-family:'DM Sans',sans-serif; color:var(--white);
+  }
+  .produto-opt:hover{border-color:var(--cyan); background:rgba(0,212,255,0.05);}
+  .produto-emoji{font-size:1.5rem; flex-shrink:0;}
+  .produto-info{flex:1;}
+  .produto-nome{font-family:'Nunito',sans-serif; font-weight:800; font-size:.92rem;}
+  .produto-tag{font-size:.72rem; color:var(--gray-soft); margin-top:.15rem;}
+  .produto-valor{font-family:'Syne',sans-serif; font-weight:800; color:var(--green); font-size:1rem; white-space:nowrap;}
+  #produtoCarregando{color:var(--gray-soft); font-size:.85rem; text-align:center; padding:1rem 0;}
+
+  .produto-fixo{display:flex; align-items:center; gap:1rem;}
+  .produto-fixo .produto-emoji{font-size:2.2rem;}
+  .trocar-link{font-size:.75rem; color:var(--cyan); text-decoration:none; margin-top:.6rem; display:inline-block;}
+
+  label{display:block; font-size:.76rem; color:var(--gray-soft); margin-bottom:.35rem; font-weight:500;}
+  input[type=text]{
+    width:100%; background:rgba(255,255,255,0.06); border:1px solid var(--border); border-radius:12px;
+    padding:.8rem 1rem; color:var(--white); font-family:'DM Sans',sans-serif; font-size:.95rem;
+    outline:none; margin-bottom:1rem; transition:border-color .2s, background .2s;
+  }
+  input[type=text]:focus{border-color:var(--cyan); background:rgba(0,212,255,0.06);}
+
+  .btn{
+    width:100%; border:none; border-radius:50px; padding:.95rem; font-family:'Syne',sans-serif;
+    font-weight:800; font-size:.95rem; cursor:pointer; transition:opacity .2s, transform .2s;
+  }
+  .btn:hover{opacity:.88; transform:translateY(-1px);}
+  .btn:disabled{opacity:.5; cursor:default; transform:none;}
+  .btn-primary{background:linear-gradient(135deg,#a78bfa,var(--cyan)); color:#0a0a1a; box-shadow:0 4px 24px rgba(167,139,250,.35);}
+  .btn-pagar{background:linear-gradient(135deg,var(--green),var(--cyan)); color:#04180f; box-shadow:0 4px 24px rgba(0,230,130,.3);}
+  .btn-ghost{background:transparent; border:1px solid var(--border); color:var(--white);}
+
+  .pedido-id{
+    font-family:'Syne',sans-serif; font-weight:800; font-size:1.6rem; letter-spacing:.06em;
+    color:var(--gold); text-align:center; margin:.4rem 0 .2rem;
+  }
+  .pedido-id-label{text-align:center; font-size:.72rem; color:var(--gray-soft); text-transform:uppercase; letter-spacing:.08em;}
+  .msg{font-size:.85rem; line-height:1.6; color:var(--gray-soft); text-align:center; margin:1rem 0;}
+  .msg.err{color:var(--red);}
+  .msg.ok{color:var(--green);}
+
+  .whats-box{
+    background:rgba(0,230,130,.07); border:1px solid rgba(0,230,130,.3); border-radius:14px;
+    padding:1rem 1.1rem; font-size:.82rem; line-height:1.6; margin-top:1rem;
+  }
+  .whats-box a{color:var(--green); font-weight:700; text-decoration:none;}
+
+  .codigo-box{
+    background:rgba(245,166,35,.08); border:1px solid rgba(245,166,35,.35); border-radius:14px;
+    padding:1.3rem; text-align:center; margin-top:1rem;
+  }
+  .codigo-valor{font-family:'Syne',sans-serif; font-weight:800; font-size:1.5rem; letter-spacing:.15em; color:var(--gold);}
+
+  .hidden{display:none !important;}
+  footer{text-align:center; padding:2rem 1rem 3rem; font-size:.78rem; color:var(--gray-soft);}
+  footer a{color:var(--cyan); text-decoration:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">ISAWERE</a>
+  <div class="steps-indicator" id="stepsIndicator">1 · Produto</div>
+</header>
+
+<main>
+  <h1 class="hero-title">Complete sua <span>compra</span></h1>
+  <p class="hero-sub">Escolha o produto, informe seus dados e finalize o pagamento pelo Mercado Pago.</p>
+
+  <!-- ETAPA 1: escolher/confirmar produto -->
+  <div class="card" id="etapaProduto">
+    <div class="card-label">📦 Produto</div>
+    <div id="produtoCarregando">Carregando produtos…</div>
+    <div id="produtoFixoView" class="produto-fixo hidden">
+      <div class="produto-emoji" id="fixoEmoji">🛒</div>
+      <div class="produto-info">
+        <div class="produto-nome" id="fixoNome">—</div>
+        <div class="produto-tag" id="fixoTag">—</div>
+      </div>
+      <div class="produto-valor" id="fixoValor">—</div>
+    </div>
+    <a href="#" class="trocar-link hidden" id="trocarProdutoLink" onclick="mostrarGrade(); return false;">Escolher outro produto</a>
+    <div id="produtosGrid"></div>
+  </div>
+
+  <!-- ETAPA 2: dados do comprador -->
+  <div class="card hidden" id="etapaDados">
+    <div class="card-label">🧾 Seus dados</div>
+    <label for="inputNome">Nome completo</label>
+    <input type="text" id="inputNome" placeholder="Seu nome">
+    <label for="inputContato">WhatsApp ou e-mail</label>
+    <input type="text" id="inputContato" placeholder="(00) 00000-0000 ou seu@email.com">
+    <button class="btn btn-primary" id="btnGerarPedido" onclick="gerarPedido()">Gerar meu pedido</button>
+    <div class="msg" id="dadosMsg"></div>
+  </div>
+
+  <!-- ETAPA 3: pagamento -->
+  <div class="card hidden" id="etapaPagamento">
+    <div class="card-label">💳 Pagamento</div>
+    <div class="pedido-id-label">Número do seu pedido</div>
+    <div class="pedido-id" id="pedidoIdView">—</div>
+    <p class="msg" id="pedidoResumo"></p>
+    <button class="btn btn-pagar" id="btnPagar" onclick="abrirPagamento()">Pagar agora com Mercado Pago</button>
+    <div class="whats-box">
+      Depois de pagar, envie o comprovante <strong>junto com o número do seu pedido</strong>
+      pelo WhatsApp, para agilizar a confirmação:
+      <br><a id="linkWhats" href="#" target="_blank">Enviar comprovante pelo WhatsApp →</a>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:1rem" onclick="verificarStatus()">Já confirmaram meu pagamento? Verificar</button>
+    <div id="statusResultado"></div>
+  </div>
+
+  <!-- Consulta avulsa de pedido -->
+  <div class="card" id="etapaConsulta">
+    <div class="card-label">🔍 Já tem um número de pedido?</div>
+    <label for="inputConsultaId">Número do pedido</label>
+    <input type="text" id="inputConsultaId" placeholder="Ex: A1B2C3D4">
+    <button class="btn btn-ghost" onclick="consultarPorId()">Consultar status</button>
+    <div id="consultaResultado"></div>
+  </div>
+</main>
+
+<footer>
+  Dúvidas? Fale com a gente pelo <a id="linkWhatsFooter" href="#" target="_blank">WhatsApp</a>.
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   ⚠️  CONFIGURAÇÕES — ALTERE AQUI
+══════════════════════════════════════════════════════ */
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxITnfKG9XCvTNN3C4iCesriU7nkXkFMbG9xVJeJQEnnKGJUpT9_EGB8Kp-CbMI_q3whA/exec';
+
+// Número de WhatsApp para receber o comprovante (só números, com DDI+DDD)
+const WHATSAPP_NUMERO = '5500000000000'; // TODO: troque pelo seu número
+
+// Link fixo de pagamento do Mercado Pago para CADA produto (crie em
+// mercadopago.com.br/ferramentas-para-vender/link-de-pagamento, um por produto,
+// com o valor exato de cada um). Preencha a chave igual à "chave" do produto.
+const LINKS_PAGAMENTO = {
+  apostilas:      'https://mpago.la/COLE_O_LINK_APOSTILAS',
+  jogos:          'https://mpago.la/COLE_O_LINK_JOGOS',
+  cursoAvulso:    'https://mpago.la/COLE_O_LINK_CURSO_AVULSO',
+  casamento:      'https://mpago.la/COLE_O_LINK_CASAMENTO',
+  praticoEscolar: 'https://mpago.la/COLE_O_LINK_PRATICO_ESCOLAR',
+  prontuario:     'https://mpago.la/COLE_O_LINK_PRONTUARIO',
+  agendamentos:   'https://mpago.la/COLE_O_LINK_AGENDAMENTOS'
+};
+
+// Emoji e legenda de cada produto (só visual, não afeta o backend)
+const VISUAL_PRODUTOS = {
+  apostilas:      { emoji:'📚', tag:'Download imediato · acesso vitalício' },
+  jogos:          { emoji:'🎮', tag:'Código de acesso · plataforma de jogos' },
+  cursoAvulso:    { emoji:'🎓', tag:'Download imediato · vitalício' },
+  casamento:      { emoji:'💍', tag:'Código de acesso · sistema pronto' },
+  praticoEscolar: { emoji:'🏫', tag:'Configuração em até 48h + mensalidade' },
+  prontuario:     { emoji:'🩺', tag:'Configuração em até 48h + mensalidade' },
+  agendamentos:   { emoji:'📅', tag:'Configuração em até 48h + mensalidade' }
+};
+/* ══════════════════════════════════════════════════════ */
+
+const STORAGE_KEY = 'isawere_pedido_atual';
+let produtos = [];
+let produtoSelecionado = null;
+let pedidoAtual = null;
+
+document.getElementById('linkWhatsFooter').href = 'https://wa.me/' + WHATSAPP_NUMERO;
+
+function formatarMoeda(v){ return 'R$ ' + Number(v).toFixed(2).replace('.', ','); }
+
+/* ── Carrega o catálogo e decide se já vem produto fixo pela URL ── */
+async function iniciar(){
+  const params = new URLSearchParams(location.search);
+  const produtoUrl = params.get('produto');
+  const idRetorno = params.get('id'); // cliente voltando do Mercado Pago
+
+  try {
+    const resp = await fetch(SCRIPT_URL + '?action=listarProdutos', { cache: 'no-store' });
+    const data = await resp.json();
+    produtos = (data && data.produtos) || [];
+  } catch(e) {
+    document.getElementById('produtoCarregando').textContent = '⚠️ Não foi possível carregar os produtos agora. Recarregue a página.';
+    return;
+  }
+
+  document.getElementById('produtoCarregando').classList.add('hidden');
+
+  // Cliente voltando do Mercado Pago (success/pending) com ?id= na URL:
+  // prioridade máxima — mostra a etapa de pagamento/consulta e já confere sozinho.
+  if (idRetorno) {
+    pedidoAtual = { id: idRetorno, aguardando: true };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pedidoAtual));
+    mostrarEtapaPagamento();
+    verificarAutomaticamente();
+    return;
+  }
+
+  if (produtoUrl && produtos.some(p => p.chave === produtoUrl)) {
+    selecionarProduto(produtoUrl, true);
+  } else {
+    mostrarGrade();
+  }
+
+  const salvo = localStorage.getItem(STORAGE_KEY);
+  if (salvo) {
+    try {
+      pedidoAtual = JSON.parse(salvo);
+      mostrarEtapaPagamento();
+    } catch(e) { localStorage.removeItem(STORAGE_KEY); }
+  }
+}
+
+/* ── Mostra a grade de seleção de produtos ── */
+function mostrarGrade(){
+  produtoSelecionado = null;
+  document.getElementById('produtoFixoView').classList.add('hidden');
+  document.getElementById('trocarProdutoLink').classList.add('hidden');
+  document.getElementById('etapaDados').classList.add('hidden');
+
+  const grid = document.getElementById('produtosGrid');
+  grid.innerHTML = produtos.map(p => {
+    const visual = VISUAL_PRODUTOS[p.chave] || { emoji:'🛒', tag:'' };
+    return `
+      <button type="button" class="produto-opt" onclick="selecionarProduto('${p.chave}', true)">
+        <div class="produto-emoji">${visual.emoji}</div>
+        <div class="produto-info">
+          <div class="produto-nome">${p.nome}</div>
+          <div class="produto-tag">${visual.tag}</div>
+        </div>
+        <div class="produto-valor">${formatarMoeda(p.valor)}</div>
+      </button>`;
+  }).join('');
+  grid.classList.remove('hidden');
+}
+
+/* ── Seleciona um produto e mostra o card fixo + etapa de dados ── */
+function selecionarProduto(chave, avancar){
+  const produto = produtos.find(p => p.chave === chave);
+  if (!produto) return;
+  produtoSelecionado = produto;
+
+  const visual = VISUAL_PRODUTOS[chave] || { emoji:'🛒', tag:'' };
+  document.getElementById('fixoEmoji').textContent = visual.emoji;
+  document.getElementById('fixoNome').textContent = produto.nome;
+  document.getElementById('fixoTag').textContent = visual.tag;
+  document.getElementById('fixoValor').textContent = formatarMoeda(produto.valor);
+
+  document.getElementById('produtosGrid').classList.add('hidden');
+  document.getElementById('produtoFixoView').classList.remove('hidden');
+  document.getElementById('trocarProdutoLink').classList.remove('hidden');
+
+  if (avancar) {
+    document.getElementById('etapaDados').classList.remove('hidden');
+    document.getElementById('stepsIndicator').textContent = '2 · Seus dados';
+    document.getElementById('etapaDados').scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+}
+
+/* ── Gera o pedido na planilha ── */
+async function gerarPedido(){
+  const nome = document.getElementById('inputNome').value.trim();
+  const contato = document.getElementById('inputContato').value.trim();
+  const msgEl = document.getElementById('dadosMsg');
+
+  if (!produtoSelecionado) { msgEl.className='msg err'; msgEl.textContent='Selecione um produto.'; return; }
+  if (!nome || !contato) { msgEl.className='msg err'; msgEl.textContent='Preencha nome e WhatsApp/e-mail.'; return; }
+
+  const btn = document.getElementById('btnGerarPedido');
+  btn.disabled = true; btn.textContent = 'Gerando pedido...';
+  msgEl.className='msg'; msgEl.textContent='';
+
+  try {
+    const resp = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action:'criarPedido', produto: produtoSelecionado.chave, nome, contato })
+    });
+    const data = await resp.json();
+
+    if (!data.ok) {
+      msgEl.className='msg err'; msgEl.textContent = '❌ ' + (data.erro || 'Não foi possível gerar o pedido.');
+      btn.disabled = false; btn.textContent = 'Gerar meu pedido';
+      return;
+    }
+
+    pedidoAtual = {
+      id: data.id, produtoChave: produtoSelecionado.chave, produtoNome: data.produto,
+      valor: data.valor, mensagem: data.mensagem, entrega: data.entrega,
+      linkPagamento: data.linkPagamento || null
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pedidoAtual));
+    mostrarEtapaPagamento();
+  } catch(e) {
+    msgEl.className='msg err'; msgEl.textContent = '⚠️ Erro de conexão. Tente novamente.';
+    btn.disabled = false; btn.textContent = 'Gerar meu pedido';
+  }
+}
+
+/* ── Mostra a etapa final com o botão de pagamento ── */
+function mostrarEtapaPagamento(){
+  document.getElementById('etapaProduto').classList.add('hidden');
+  document.getElementById('etapaDados').classList.add('hidden');
+  document.getElementById('etapaPagamento').classList.remove('hidden');
+  document.getElementById('etapaConsulta').classList.add('hidden');
+  document.getElementById('stepsIndicator').textContent = '3 · Pagamento';
+  document.getElementById('pedidoIdView').textContent = pedidoAtual.id;
+
+  if (pedidoAtual.aguardando) {
+    // Cliente voltou do Mercado Pago e ainda não temos os dados completos
+    // do pedido (nome do produto, valor) guardados localmente — só o ID.
+    document.getElementById('pedidoResumo').textContent = 'Confirmando seu pagamento, aguarde um instante…';
+    document.getElementById('btnPagar').classList.add('hidden');
+    document.querySelector('.whats-box').classList.add('hidden');
+  } else {
+    document.getElementById('pedidoResumo').textContent =
+      pedidoAtual.produtoNome + ' — ' + formatarMoeda(pedidoAtual.valor) + '. ' + (pedidoAtual.mensagem || '');
+    document.getElementById('btnPagar').classList.remove('hidden');
+    document.querySelector('.whats-box').classList.remove('hidden');
+    document.getElementById('linkWhats').href =
+      'https://wa.me/' + WHATSAPP_NUMERO + '?text=' + encodeURIComponent('Olá! Segue o comprovante do meu pedido nº ' + pedidoAtual.id + ' (' + pedidoAtual.produtoNome + ').');
+  }
+
+  document.getElementById('etapaPagamento').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+/* ── Abre o link de pagamento: prioriza o link dinâmico do Mercado Pago
+   (gerado automaticamente por criarPedido, já amarrado a este pedido pra
+   confirmação automática); se não existir, cai no link fixo manual. ── */
+function abrirPagamento(){
+  if (pedidoAtual.linkPagamento) {
+    window.open(pedidoAtual.linkPagamento, '_blank');
+    return;
+  }
+  const link = LINKS_PAGAMENTO[pedidoAtual.produtoChave];
+  if (!link || link.includes('COLE_O_LINK')) {
+    alert('O link de pagamento deste produto ainda não foi configurado. Avise o administrador.');
+    return;
+  }
+  window.open(link, '_blank');
+}
+
+/* ── Verifica o status do pedido atual ── */
+async function verificarStatus(){
+  if (!pedidoAtual) return;
+  await consultarEExibir(pedidoAtual.id, 'statusResultado');
+}
+
+/* ── Consulta um pedido avulso pelo número informado ── */
+async function consultarPorId(){
+  const id = document.getElementById('inputConsultaId').value.trim().toUpperCase();
+  if (!id) return;
+  await consultarEExibir(id, 'consultaResultado');
+}
+
+/* ── Monta o HTML de resultado a partir da resposta de consultarPedido.
+   Reaproveitada tanto pela consulta manual quanto pela verificação automática
+   de quem está voltando do Mercado Pago. Cobre os 3 formatos de entrega:
+   código de acesso, link de download, e implantação manual. ── */
+function montarResultadoHtml(data){
+  if (!data.ok) {
+    return '<p class="msg err">❌ ' + (data.erro || 'Pedido não encontrado.') + '</p>';
+  }
+  if (data.status === 'pendente') {
+    return '<p class="msg">⏳ Ainda não identificamos seu pagamento. Se você já pagou, aguarde alguns segundos — a confirmação é automática. Também pode enviar o comprovante pelo WhatsApp para agilizar.</p>';
+  }
+  if (data.status === 'pago' && data.entrega === 'codigo' && data.codigo) {
+    return '<div class="codigo-box"><div class="produto-tag">✅ Pagamento confirmado! Seu código de acesso:</div><div class="codigo-valor">' + data.codigo + '</div></div>';
+  }
+  if (data.status === 'pago' && data.entrega === 'link' && data.linkArquivo) {
+    return '<div class="codigo-box"><div class="produto-tag">✅ Pagamento confirmado! Baixe seu material:</div>' +
+      '<a class="btn btn-primary" style="margin-top:.8rem; display:inline-block; width:auto; padding:.7rem 1.4rem;" href="' + data.linkArquivo + '" target="_blank">📥 Baixar agora</a></div>';
+  }
+  if (data.status === 'em_configuracao') {
+    return '<p class="msg ok">✅ Pagamento confirmado! Estamos configurando seu sistema — você recebe os dados de acesso em até 48h.</p>';
+  }
+  if (data.status === 'entregue') {
+    return '<p class="msg ok">✅ Seu sistema já foi entregue. Qualquer dúvida, fale com a gente pelo WhatsApp.</p>';
+  }
+  return '<p class="msg">Status: ' + data.status + '</p>';
+}
+
+async function consultarEExibir(id, elId){
+  const el = document.getElementById(elId);
+  el.innerHTML = '<p class="msg">Consultando...</p>';
+  try {
+    const resp = await fetch(SCRIPT_URL + '?action=consultarPedido&id=' + encodeURIComponent(id), { cache:'no-store' });
+    const data = await resp.json();
+    el.innerHTML = montarResultadoHtml(data);
+    return data;
+  } catch(e) {
+    el.innerHTML = '<p class="msg err">⚠️ Erro de conexão. Tente novamente.</p>';
+    return null;
+  }
+}
+
+/* ── Verificação automática: usada quando o cliente volta do Mercado Pago
+   (?id= na URL). Confere o pedido a cada poucos segundos, sem precisar de
+   clique, até confirmar o pagamento (ou desistir depois de um tempo). ── */
+async function verificarAutomaticamente(){
+  const maxTentativas = 15; // ~45s no total
+  let tentativa = 0;
+
+  const passo = async () => {
+    tentativa++;
+    const data = await consultarEExibir(pedidoAtual.id, 'statusResultado');
+
+    if (data && data.ok) {
+      // Assim que os dados completos do pedido chegarem, atualiza o resumo
+      // da etapa de pagamento (nome do produto, valor) — antes só tínhamos o ID.
+      if (pedidoAtual.aguardando) {
+        pedidoAtual.aguardando = false;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(pedidoAtual));
+      }
+      if (data.status !== 'pendente') return; // já confirmado, para de tentar
+    }
+
+    if (tentativa < maxTentativas) {
+      setTimeout(passo, 3000);
+    }
+  };
+
+  passo();
+}
+
+iniciar();
+</script>
+</body>
+</html>
