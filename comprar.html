@@ -145,7 +145,7 @@
     <div class="card-label">🧾 Seus dados</div>
     <label for="inputNome">Nome completo</label>
     <input type="text" id="inputNome" placeholder="Seu nome">
-    <label for="inputContato">WhatsApp ou e-mail</label>
+    <label for="inputContato">E-mail</label>
     <input type="text" id="inputContato" placeholder="(00) 00000-0000 ou seu@email.com">
     <button class="btn btn-primary" id="btnGerarPedido" onclick="gerarPedido()">Gerar meu pedido</button>
     <div class="msg" id="dadosMsg"></div>
@@ -328,7 +328,7 @@ async function gerarPedido(){
   const msgEl = document.getElementById('dadosMsg');
 
   if (!produtoSelecionado) { msgEl.className='msg err'; msgEl.textContent='Selecione um produto.'; return; }
-  if (!nome || !contato) { msgEl.className='msg err'; msgEl.textContent='Preencha nome e WhatsApp/e-mail.'; return; }
+  if (!nome || !contato) { msgEl.className='msg err'; msgEl.textContent='Preencha com sue E-mail.'; return; }
 
   const btn = document.getElementById('btnGerarPedido');
   btn.disabled = true; btn.textContent = 'Gerando pedido...';
