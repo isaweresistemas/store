@@ -758,7 +758,7 @@ async function carregarVendas() {
   } catch (err) {
     document.getElementById('pedidosArea').innerHTML =
       '<div class="state-msg"><div class="state-icon">⚠️</div>Não foi possível carregar os pedidos.<br>' +
-      '<small>Confira se SCRIPT_URL_VENDAS está preenchida corretamente.</small></div>';
+      '<small>Erro técnico: ' + escapar(String(err && err.message || err)) + '</small></div>';
     document.getElementById('assinaturasArea').innerHTML = '';
   }
 }
