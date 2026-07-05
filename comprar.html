@@ -264,17 +264,13 @@ async function iniciar(){
     return;
   }
 
-  // Sem produto na URL (acesso genérico ao comprar.html): aí sim, se tiver
-  // um pedido salvo (ex: a pessoa recarregou a página no meio da compra),
-  // retoma de onde parou.
+  // Sem produto na URL (acesso genérico ao comprar.html): sempre mostra a
+  // grade normal com todos os produtos. Não tenta "adivinhar" e retomar um
+  // pedido salvo de antes — isso já causou confusão (pedido antigo/de outra
+  // pessoa aparecendo sozinho). Quem quiser retomar um pedido específico usa
+  // a busca manual "Já tem um número de pedido?", que já existe pra isso.
+  localStorage.removeItem(STORAGE_KEY);
   mostrarGrade();
-  const salvo = localStorage.getItem(STORAGE_KEY);
-  if (salvo) {
-    try {
-      pedidoAtual = JSON.parse(salvo);
-      mostrarEtapaPagamento();
-    } catch(e) { localStorage.removeItem(STORAGE_KEY); }
-  }
 }
 
 /* ── Mostra a grade de seleção de produtos ── */
